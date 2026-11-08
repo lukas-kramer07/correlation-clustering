@@ -41,7 +41,7 @@ python adversarial_search.py 7     # exact hill-climbing search on 7-vertex inst
 
 * `K_n` minus one edge: E[Pivot] = (3 - 6/n)·OPT, so the 3 bound is tight; LP rounding pays OPT.
 * Star with m leaves: E[LP rounding] / LP -> 2.5, so the 2.5 bound (relative to LP) is tight.
-* An exact adversarial search on 7 vertices rediscovers exactly these two families.
+* An exact adversarial search on 7 vertices finds nothing worse: its Pivot maximum is 15/7, the value of `K_7` minus one edge (attained on `K_7` minus three disjoint edges), and its LP rounding maximum is the 6-leaf star.
 * On random, planted, weighted and real instances: mean ratios to LP of 1.0-2.5 (Pivot) and 1.0-1.96 (LP rounding);
   LP rounding is optimal whenever the LP is integral (low noise, consensus data).
 

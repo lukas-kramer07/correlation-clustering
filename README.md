@@ -15,10 +15,10 @@ J. ACM 55(5), 2008, on unweighted complete graphs:
 cc/instance.py     instances and the cost function
 cc/algorithms.py   pivot (kwikcluster) and lp_rounding (lp_kwikcluster)
 cc/lp.py           LP relaxation and exact ILP, both with lazy triangle constraints (HiGHS)
-cc/exact.py        brute-force OPT, exact E[cost] of both algorithms for tiny n
+cc/exact.py        brute-force OPT, exact E[cost] of both algorithms, all graphs up to relabelling (tiny n)
 cc/generators.py   random, planted (best case), K_n minus an edge, star (worst cases)
 cc/datasets.py     similarity graphs from scikit-learn data sets (Iris, Wine, Breast Cancer)
-experiments/       run_experiments.py (all results), adversarial_search.py, summarize.py
+experiments/       run_experiments.py (all results), exhaustive_search.py, summarize.py
 results/           CSV output of the experiments
 tests/             pytest suite
 ```
@@ -31,14 +31,16 @@ pip install -r requirements.txt
 pytest -q tests
 cd experiments
 python run_experiments.py          # ~10-15 min, writes results/*.csv
-python adversarial_search.py 7     # exact hill-climbing search on 7-vertex instances
+python exhaustive_search.py        # ~15 s, exact check of every sign pattern on up to 7 vertices
 ```
 
 ## Headline results
 
 * `K_n` minus one edge: E[Pivot] = (3 - 6/n)·OPT, so the 3 bound is tight; LP rounding pays OPT.
 * Star with m leaves: E[LP rounding] / LP -> 2.5, so the 2.5 bound (relative to LP) is tight.
-* An exact adversarial search on 7 vertices finds nothing worse: its Pivot maximum is 15/7, the value of `K_7` minus one edge (attained on `K_7` minus three disjoint edges), and its LP rounding maximum is the 6-leaf star.
+* An exhaustive exact check of every sign pattern on up to 7 vertices (1,044 graphs up to relabelling at n = 7) finds nothing worse.
+  For each n from 4 to 7 the maximum of E[Pivot] / OPT is exactly 3 - 6/n, the value of `K_n` minus one edge, and the unique
+  maximiser of E[LP rounding] / LP is the star. The maximum of E[LP rounding] / OPT is 1.64 (for the LP optimum the solver returns).
 * On random, planted and real instances: mean cost / LP of at most 2.54 (Pivot) and 1.97 (LP rounding).
 * Planted clusters with 5% noise are the hardest case for Pivot (about 2.4-2.5·OPT); the LP is integral
   there, so LP rounding is optimal in every run. At 20-40% noise LP rounding gains nothing over Pivot.

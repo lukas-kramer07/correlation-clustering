@@ -4,7 +4,8 @@ import numpy as np
 import pytest
 
 from cc import Instance, kwikcluster, lp_kwikcluster, solve_ilp, solve_lp
-from cc.exact import brute_force_opt, expected_kwikcluster, expected_lp_kwikcluster, set_partitions
+from cc.exact import (brute_force_opt, expected_kwikcluster, expected_lp_kwikcluster, graph_classes,
+                      set_partitions)
 from cc.generators import complete_minus_edge, planted, random_signed, star
 
 
@@ -19,6 +20,13 @@ def test_cost_counts_disagreements():
 
 def test_bell_numbers():
     assert [len(set_partitions(n)) for n in range(1, 8)] == [1, 2, 5, 15, 52, 203, 877]
+
+
+def test_graph_class_counts():
+    # number of graphs on n unlabelled vertices (OEIS A000088)
+    assert [len(graph_classes(n)) for n in range(1, 7)] == [1, 2, 4, 11, 34, 156]
+    reps = graph_classes(5)
+    assert (reps == reps.transpose(0, 2, 1)).all() and not reps[:, range(5), range(5)].any()
 
 
 @pytest.mark.parametrize("seed", range(8))

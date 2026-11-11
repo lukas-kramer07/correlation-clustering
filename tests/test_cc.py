@@ -3,9 +3,9 @@ import itertools
 import numpy as np
 import pytest
 
-from cc import Instance, kwikcluster, local_search, lp_kwikcluster, solve_ilp, solve_lp
+from cc import Instance, kwikcluster, lp_kwikcluster, solve_ilp, solve_lp
 from cc.exact import brute_force_opt, expected_kwikcluster, expected_lp_kwikcluster, set_partitions
-from cc.generators import complete_minus_edge, planted, random_probability, random_signed, star
+from cc.generators import complete_minus_edge, planted, random_signed, star
 
 
 def test_cost_counts_disagreements():
@@ -24,7 +24,7 @@ def test_bell_numbers():
 @pytest.mark.parametrize("seed", range(8))
 def test_lp_le_ilp_eq_bruteforce(seed):
     rng = np.random.default_rng(seed)
-    inst = random_signed(7, 0.5, rng) if seed % 2 else random_probability(7, rng)
+    inst = random_signed(7, 0.5, rng)
     lp, D, _ = solve_lp(inst)
     opt, lab, _ = solve_ilp(inst)
     bf, _ = brute_force_opt(inst)
@@ -68,12 +68,6 @@ def test_best_case_recovered_exactly():
     lp, D, _ = solve_lp(inst)
     assert lp == pytest.approx(0)
     assert inst.cost(lp_kwikcluster(inst, D, 0)) == 0
-
-
-def test_local_search_never_worse():
-    inst = random_signed(30, 0.4, 5)
-    lab = kwikcluster(inst, 1)
-    assert inst.cost(local_search(inst, lab)) <= inst.cost(lab)
 
 
 def test_presentation_aliases():

@@ -1,4 +1,4 @@
-"""Pivot-based algorithms of Ailon, Charikar and Newman (J. ACM 2008), plus baselines.
+"""Pivot-based algorithms of Ailon, Charikar and Newman (J. ACM 2008).
 
 kwikcluster     : KwikCluster.  Pick a uniformly random pivot among the unclustered
                   vertices, cluster it with all its unclustered '+' neighbours, recurse.
@@ -6,8 +6,6 @@ kwikcluster     : KwikCluster.  Pick a uniformly random pivot among the uncluste
 lp_kwikcluster  : LP-KwikCluster.  Same recursion, but j joins pivot k's cluster
                   independently with probability x+_kj = 1 - d_kj, where d is an optimal
                   solution of the LP relaxation (computed once, reused in every call).
-pick_a_cluster  : best of a list of input clusterings (consensus clustering baseline).
-local_search    : single-vertex-move local search (a common practical heuristic).
 
 Scanning a uniformly random permutation and treating the first unclustered vertex as the
 next pivot is equivalent to choosing each pivot uniformly among the remaining vertices.
@@ -57,38 +55,6 @@ def lp_kwikcluster(inst: Instance, dist: np.ndarray, rng=None) -> np.ndarray:
         labels[members] = c
         unassigned &= ~members
         c += 1
-    return labels
-
-
-def pick_a_cluster(inst: Instance, clusterings) -> np.ndarray:
-    costs = [inst.cost(c) for c in clusterings]
-    return np.asarray(clusterings[int(np.argmin(costs))])
-
-
-def local_search(inst: Instance, labels, max_passes: int = 50) -> np.ndarray:
-    """Move single vertices to the cluster (or a new singleton) that most reduces cost."""
-    labels = np.asarray(labels).copy()
-    n = inst.n
-    Wd = inst.w_minus - inst.w_plus  # extra cost of having pair together vs apart
-    for _ in range(max_passes):
-        improved = False
-        for v in range(n):
-            ks, lab = np.unique(labels, return_inverse=True)
-            M = np.zeros((n, len(ks)))
-            M[np.arange(n), lab] = 1.0
-            M[v, lab[v]] = 0.0
-            gain_with = Wd[v] @ M          # cost of joining each cluster, relative to singleton
-            cur = gain_with[lab[v]]
-            best = int(np.argmin(gain_with))
-            best_val = min(gain_with[best], 0.0)  # 0.0 = become a singleton
-            if best_val < cur - 1e-12:
-                if gain_with[best] <= 0.0:
-                    labels[v] = ks[best]
-                else:
-                    labels[v] = labels.max() + 1
-                improved = True
-        if not improved:
-            break
     return labels
 
 

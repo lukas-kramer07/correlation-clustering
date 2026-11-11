@@ -50,12 +50,3 @@ def star(leaves: int) -> Instance:
     plus[0, 1:] = plus[1:, 0] = True
     return Instance.from_signs(plus, f"star({leaves})")
 
-
-def random_probability(n: int, rng=None) -> Instance:
-    """Weighted instance with w+ ~ U[0,1], w- = 1 - w+ (ACN probability constraints)."""
-    rng = np.random.default_rng(rng)
-    W = np.triu(rng.random((n, n)), k=1)
-    W = W + W.T
-    Wm = 1 - W
-    np.fill_diagonal(Wm, 0)
-    return Instance(W, Wm, f"prob(n={n})")
